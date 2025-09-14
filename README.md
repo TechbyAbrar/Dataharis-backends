@@ -69,7 +69,7 @@ Remission is a backend API project built with Django and Django REST Framework. 
 
 1. Clone the repo:
 ```bash
-git clone https://github.com/TechbyAbrar/Dataharis-Backends-API.git
+git clone https://github.com/TechbyAbrar/Dataharis-backends.git
 cd Dataharis-Backends-API
 Create virtual environment and install dependencies:
 
@@ -110,3 +110,4 @@ Run this to auto-generate:
 
 ```bash
 pip freeze > requirements.txt
+
