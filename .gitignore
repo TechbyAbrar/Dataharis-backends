@@ -8,3 +8,10 @@ venv/
 node_modules/
 staticfiles/
 media/
+
+# Ignore Python cache files
+__pycache__/
+*.py[cod]
+
+# Ignore Stripe executable
+stripe.exe
