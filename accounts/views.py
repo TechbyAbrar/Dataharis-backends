@@ -285,7 +285,7 @@ from donations.models import Donation
 from django.db.models import Sum
 
 @api_view(['GET'])
-@cache_page(60 * 15)
+# @cache_page(60 * 1)
 @permission_classes([IsAuthenticated])
 def dashboardView(request):
     user = request.user
@@ -308,7 +308,7 @@ def dashboardView(request):
         return Response(
             {   'status_code': 403,
                 "error": "Permission denied. Only admin can access this resource."},
-            status=status.HTTP_403_FORBIDDEN
+            status=status.HTTP
         )
 
 @api_view(['GET'])
@@ -364,11 +364,6 @@ def forgot_password(request):
     )
 
     return Response({"message": "OTP sent to your email address."}, status=status.HTTP_200_OK)
-
-
-
-
-
 
 
 
