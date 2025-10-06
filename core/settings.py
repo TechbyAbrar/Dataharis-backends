@@ -84,6 +84,7 @@ AUTH_USER_MODEL = 'accounts.UserAuth'
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -93,7 +94,21 @@ MIDDLEWARE = [
     'allauth.account.middleware.AccountMiddleware',     #0auth
 ]
 
-CORS_ALLOW_ALL_ORIGINS = env('CORS_ALLOW_ALL_ORIGINS', cast=bool, default=False)
+CORS_ALLOW_ALL_ORIGINS = False
+
+CORS_ALLOW_CREDENTIALS = True
+
+
+CORS_ALLOWED_ORIGINS = [
+    "http://enitiative.org",
+    "https://enitiative.org",
+    "https://www.enitiative.org",
+    "http://localhost:5173",
+    "http://localhost:3000",
+    'https://api.enitiative.org',
+    'https://dashboard.enitiative.org',
+]
+
 
 ROOT_URLCONF = 'core.urls'
 
@@ -175,14 +190,16 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
+# STATIC FILES
+# ----------------------
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]  # For development
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')    # For production (collectstatic)
+STATIC_ROOT = BASE_DIR / "staticfiles"   # for production collectstatic
 
-# Media files
+# ----------------------
+# MEDIA FILES
+# ----------------------
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
+MEDIA_ROOT = BASE_DIR / "media"  
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
@@ -319,3 +336,38 @@ CACHES = {
         }
     }
 }
+
+
+# settings.py
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+    },
+    "loggers": {
+        "django.security.DisallowedHost": {
+            "handlers": ["console"],
+            "level": "ERROR",   # change to "CRITICAL" or "FATAL" to hide most of them
+            "propagate": False,
+        },
+    },
+}
+
+
+
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://enitiative.org',
+    'https://www.enitiative.org',
+    'http://enitiative.org:8080',   # add this if testing on port 8080
+    'http://localhost:5173',
+    "http://localhost:3000",
+    'https://api.enitiative.org',
+]
+
+
+# WhiteNoise settings (optional)
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"

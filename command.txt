@@ -1,0 +1,77 @@
+sudo systemctl daemon-reload
+sudo systemctl enable gunicorn
+sudo systemctl start gunicorn
+
+sudo systemctl status gunicorn
+sudo systemctl restart gunicorn
+
+sudo journalctl -u gunicorn -f
+
+
+#logs
+
+tail -f /home/backends/project_backend/logs/gunicorn-access.log
+tail -f /home/backends/project_backend/logs/gunicorn-error.log
+
+
+sudo systemctl daemon-reload
+sudo systemctl enable uvicorn
+sudo systemctl start uvicorn
+sudo systemctl status uvicorn
+sudo systemctl restart uvicorn
+
+
+
+sudo nginx -t
+sudo systemctl restart nginx
+
+
+sudo apt update
+sudo apt install redis-server -y
+
+
+sudo systemctl status redis
+
+
+#kill port
+sudo fuser -k 8000/tcp
+
+#check port
+sudo lsof -i :8000
+
+
+
+# Enable Docker to run as non-root
+
+sudo systemctl enable docker
+sudo systemctl start docker
+sudo usermod -aG docker $USER
+
+
+
+# frontend
+pm2 start "npm start" --name frontend --cwd /root/var/dhataharris-frontend --env PORT=3000
+
+pm2 save
+
+pm2 startup systemd
+
+
+# print value: sudo env PATH=$PATH:/usr/bin pm2 startup systemd -u root --hp /root
+
+
+
+# dashboard
+pm2 start "npm start" --name dashboard --cwd /home/backends/project_dashboard --env PORT=4000
+
+pm2 save
+
+
+pm2 startup systemd
+
+
+#optional
+npm run build
+pm2 delete dashboard
+pm2 start "npm start" --name dashboard --cwd /home/backends/project_dashboard
+pm2 save

@@ -12,7 +12,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserAuth
         fields = ['id', 'email', 'full_name', 'profile_pic' , 'occupation', 'mobile_no', 'location', 'is_verified','date_joined', 'updated_at']
-        read_only_fields = ['id', 'email', 'is_verified']
+        read_only_fields = ['id', 'email', 'is_verified','date_joined']
         
         
 # SOCAIL AUTH

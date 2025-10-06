@@ -21,7 +21,7 @@ class CreateCheckoutSession(APIView):
                 location=serializer.validated_data.get('location'),
                 amount=serializer.validated_data['amount'],
             )
-            print(donation)
+            # print(donation)
 
             try:
                 session = stripe.checkout.Session.create(
@@ -37,15 +37,18 @@ class CreateCheckoutSession(APIView):
                     
                     mode='payment',
                     customer_email=donation.email,
-                    success_url='http://localhost:8000/success?session_id={CHECKOUT_SESSION_ID}',
-                    cancel_url='http://localhost:8000/',
+                    success_url='https://enitiative.org/success?session_id={CHECKOUT_SESSION_ID}',
+                    cancel_url='https://enitiative.org/cancel',
                 )
-                print("Session:",session)
+                # print("Session:",session)
 
                 donation.stripe_session_id = session.id
                 donation.stripe_session_url = session.url
                 donation.save()
-                return Response({'sessionId': session.id, 'sessionUrl':session.url}, status=200)
+                return Response({
+                    'success': True,
+                    'message': 'Checkout session created successfully.',
+                    'sessionId': session.id, 'sessionUrl':session.url}, status=200)
 
             except Exception as e:
                 return Response({'error': str(e)}, status=400)

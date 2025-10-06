@@ -120,6 +120,11 @@ def process_message(request, data: MessageRequest):
         previous_messages = AI_ChatMessage.objects.filter(session=session).order_by("-timestamp")[:10]
         # Reverse to maintain chronological order
         previous_messages = list(previous_messages)[::-1]
+        
+        
+
+        
+        
         messages = [
             {"role": "system", "content": "You are a helpful assistant specialized in Multiple Sclerosis (MS)."}
         ]
@@ -141,6 +146,32 @@ def process_message(request, data: MessageRequest):
             query_text=data.message,
             response_text=ai_response
         )
+        
+        #####
+        try:
+            all_messages = AI_ChatMessage.objects.filter(session=session).order_by("timestamp")[:5]
+            summary_prompt = [
+                {"role": "system", "content": "Summarize the following chat into a very short 4–6 word title."},
+                {"role": "user", "content": "\n".join([f"User: {m.query_text}\nAssistant: {m.response_text}" for m in all_messages])}
+            ]
+            summary_response = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=summary_prompt,
+                max_tokens=20
+            )
+            new_title = summary_response.choices[0].message.content.strip()
+            if new_title:
+                session.title = new_title
+                session.save(update_fields=["title", "last_updated"])
+        except Exception as e:
+            logger.warning(f"Failed to auto-update session title: {str(e)}")
+            #########
+ 
+        
+        
+        
+        
+        
         return MessageResponse(
             session_id=str(session.id),
             message=data.message,
