@@ -91,7 +91,9 @@ class StripeWebhookView(APIView):
         return Response({'status': 'success'}, status=200)
 
 
-class AllDonationList(generics.ListAPIView):
+from  blogs.base import BaseAPIView
+
+class AllDonationList(BaseAPIView,generics.ListAPIView):
     queryset = Donation.objects.all().order_by('-created_at')
     serializer_class = DonationSerializer
     permission_classes = [IsSuperUserOrReadOnly]
@@ -99,7 +101,7 @@ class AllDonationList(generics.ListAPIView):
     
 
 from rest_framework.exceptions import NotFound
-class DonatorDetails(generics.RetrieveAPIView):
+class DonatorDetails(BaseAPIView,generics.RetrieveAPIView):
     queryset = Donation.objects.all()
     serializer_class = DonationSerializer
     permission_classes = [IsSuperUserOrReadOnly]

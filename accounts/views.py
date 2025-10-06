@@ -126,6 +126,9 @@ def login(request):
             refresh = RefreshToken.for_user(user)
             access_token = refresh.access_token
             return Response({
+                'success': True,
+                'message': 'Logged in successful',  
+                'status_code': 200, 
                 'refresh': str(refresh),
                 'access': str(access_token),
                 'user_profile': UserSerializer(user_info).data
@@ -162,9 +165,13 @@ def verify_email(request):
             refresh = RefreshToken.for_user(user)
             access_token = str(refresh.access_token)
             
-            return Response({'status': 'success','access':access_token,"message": "Email verified successfully."}, status=status.HTTP_200_OK)
+            return Response({
+                'success':True,
+                'message': 'Email verified successfully.',
+                'status_code': 200,
+                'status': 'success','access':access_token}, status=status.HTTP_200_OK)
         else:
-            return Response({'status': 'error',"message": "Invalid OTP."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'status': 'error',"message": "Invalid OTP.", 'status_code':400}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def resend_otp(request):
@@ -199,7 +206,10 @@ def resend_otp(request):
         )
     except Exception as e:
         return Response({"error": "Failed to send OTP email. Please try again later."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    return Response({"message": "We sent you an OTP to your email."}, status=status.HTTP_200_OK)
+    return Response({
+        'success': True,
+        'status_code': 200,
+        "message": "We sent you an OTP to your email."}, status=status.HTTP_200_OK)
 
 
 
@@ -212,7 +222,11 @@ def user_profile(request):
 
     if request.method == 'GET':
         serializer = UserSerializer(user_profile)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({
+            'success': True,
+            'message': 'User profile fetched successfully',
+            'status_code': 200,
+            'data':serializer.data}, status=status.HTTP_200_OK)
 
 
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -240,7 +254,9 @@ def update_user_profile(request):
     serializer = UserSerializer(user_profile, data=data, partial=True)
     if serializer.is_valid():
         serializer.save()
-        return Response({"message": "Successfully Updated Profile"}, status=status.HTTP_200_OK)
+        return Response({
+            'success': True,
+            "message": "Successfully Updated Profile"}, status=status.HTTP_200_OK)
     
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -280,6 +296,9 @@ def dashboardView(request):
         total_donations = Donation.objects.aggregate(total=Sum('amount'))['total'] or 0
         serializer = UserSerializer(all_user_list, many=True)
         return Response({
+                'success': True,
+                'message': 'Admin dashboard data fetched successfully',
+                'status_code': 200,
                 'all_user_list': len(all_user_list),
                 'total_stories': total_stories,
                 'total_donations': total_donations,
@@ -287,7 +306,8 @@ def dashboardView(request):
             }, status=status.HTTP_200_OK)
     else:
         return Response(
-            {"error": "Permission denied. Only admin can access this resource."},
+            {   'status_code': 403,
+                "error": "Permission denied. Only admin can access this resource."},
             status=status.HTTP_403_FORBIDDEN
         )
 
@@ -299,38 +319,25 @@ def specific_user(request, pk):
         try:
             user_profile = UserAuth.objects.get(pk=pk)
             serializer = UserSerializer(user_profile)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response({
+                'success': True,
+                'message': 'User profile fetched successfully',
+                'status_code': 200,
+                'data': serializer.data
+                }, status=status.HTTP_200_OK)
         except UserAuth.DoesNotExist:
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
     else:
         return Response(
-            {"error": "Permission denied. Only admin can access this resource."},
+            {
+                'status_code': 403,
+                "error": "Permission denied. Only admin can access this resource."},
             status=status.HTTP_403_FORBIDDEN
         )
 
 
 
-# @api_view(['POST'])
-# def forgot_password(request):
-#     email = request.data.get('email')
-#     new_password = request.data.get('new_password')
-#     confirm_password = request.data.get('confirm_password')
 
-#     if new_password != confirm_password:
-#         return Response({"error": "New password and confirmation password do not match."}, status=status.HTTP_400_BAD_REQUEST)
-
-#     elif email is None or new_password is None:
-#         return Response({"message": "Please provide email and new password"}, status=status.HTTP_400_BAD_REQUEST)
-
-#     try:
-#         user = UserAuth.objects.get(email=email)
-#         user.set_password(new_password)
-#         user.save()
-#     except:
-#         return Response({"message": "Invalid Email"}, status=status.HTTP_400_BAD_REQUEST)
-
-
-#     return Response({"message": "Successfully reset your password."}, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
@@ -361,27 +368,7 @@ def forgot_password(request):
 
 
 
-# from rest_framework_simplejwt.tokens import RefreshToken, TokenError
-# from rest_framework.permissions import IsAuthenticated
 
-# @api_view(['POST'])
-# @permission_classes([IsAuthenticated])
-# def logout(request):
-#     try:
-#         refresh_token = request.data.get("refresh")
-
-#         if refresh_token is None:
-#             return Response({"error": "Refresh token is required."}, status=status.HTTP_400_BAD_REQUEST)
-
-#         token = RefreshToken(refresh_token)
-#         token.blacklist()
-
-#         return Response({"message": "Logout successful."}, status=status.HTTP_205_RESET_CONTENT)
-    
-#     except TokenError:
-#         return Response({"error": "Invalid or expired refresh token."}, status=status.HTTP_400_BAD_REQUEST)
-#     except Exception as e:
-#         return Response({"error": "Something went wrong during logout."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 
