@@ -41,8 +41,8 @@
 
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
-from .models import Blog, MsPost
-from .serializers import BlogSerializer, MsPostSerializer
+from .models import Blog, MsPost, MsVideo
+from .serializers import BlogSerializer, MsPostSerializer, MsVideoSerializer
 from .permissions import IsOwnerOrSuperUser, IsSuperUserOrReadOnly
 from .base import BaseAPIView
 
@@ -74,4 +74,18 @@ class MsPostListCreateAPIView(BaseAPIView, generics.ListCreateAPIView):
 class MsPostRetrieveUpdateDestroyAPIView(BaseAPIView, generics.RetrieveUpdateDestroyAPIView):
     queryset = MsPost.objects.all()
     serializer_class = MsPostSerializer
+    permission_classes = [IsSuperUserOrReadOnly]
+
+
+class MsVideoListCreateAPIView(BaseAPIView, generics.ListCreateAPIView):
+    queryset = MsVideo.objects.all().order_by('-created_at')
+    serializer_class = MsVideoSerializer
+    permission_classes = [IsSuperUserOrReadOnly]
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+        
+class MsVideoRetrieveUpdateDestroyAPIView(BaseAPIView, generics.RetrieveUpdateDestroyAPIView):
+    queryset = MsVideo.objects.all()
+    serializer_class = MsVideoSerializer
     permission_classes = [IsSuperUserOrReadOnly]

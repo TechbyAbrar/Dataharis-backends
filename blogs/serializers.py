@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Blog, MsPost
+from .models import Blog, MsPost, MsVideo
 from accounts.models import UserAuth
 
 
@@ -23,3 +23,11 @@ class MsPostSerializer(serializers.ModelSerializer):
         fields = ["id", "author", "title", "author_name", "image", "description", "created_at", "updated_at"]
         read_only_fields = ["id", "author",'created_at', 'updated_at']
 
+
+class MsVideoSerializer(serializers.ModelSerializer):
+    # author_name = serializers.StringRelatedField(source="author", read_only=True)
+    author_name = serializers.CharField(source="author.full_name", read_only=True)
+    class Meta:
+        model = MsVideo
+        fields = ["id", "author", "title", "author_name", "video_url", "description", "created_at", "updated_at"]
+        read_only_fields = ["id", "author",'created_at', 'updated_at']
